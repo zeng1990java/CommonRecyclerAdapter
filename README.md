@@ -1,0 +1,2 @@
+# CommonRecyclerAdapter
+一个用于RecyclerView Adapter开发库，包含添加Header，Footer，加载更多和支持多种布局
