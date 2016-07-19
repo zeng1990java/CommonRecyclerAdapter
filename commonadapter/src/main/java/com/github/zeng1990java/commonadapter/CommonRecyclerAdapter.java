@@ -102,17 +102,17 @@ public abstract class CommonRecyclerAdapter<T> extends RecyclerView.Adapter<View
         return isLoadingMore;
     }
 
-    public View addHeaderView(@LayoutRes int layoutId){
+    public ViewBinder addHeaderView(@LayoutRes int layoutId){
         ensureHeaderLayout();
         View header = mInflater.inflate(layoutId, mHeaderLayout, false);
         return addHeaderView(header);
     }
 
-    public View addHeaderView(View header){
+    public ViewBinder addHeaderView(View header){
         ensureHeaderLayout();
         mHeaderLayout.addView(header);
         notifyDataSetChanged();
-        return header;
+        return ViewBinder.create(header);
     }
 
     public void removeHeaderView(View header){
@@ -121,17 +121,17 @@ public abstract class CommonRecyclerAdapter<T> extends RecyclerView.Adapter<View
         notifyDataSetChanged();
     }
 
-    public View addFooterView(@LayoutRes int layoutId){
+    public ViewBinder addFooterView(@LayoutRes int layoutId){
         ensureFooterLayout();
         View footer = mInflater.inflate(layoutId, mFooterLayout, false);
         return addFooterView(footer);
     }
 
-    public View addFooterView(View footer){
+    public ViewBinder addFooterView(View footer){
         ensureFooterLayout();
         mFooterLayout.addView(footer);
         notifyDataSetChanged();
-        return footer;
+        return ViewBinder.create(footer);
     }
 
     public void removeFooterView(View footer){

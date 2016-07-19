@@ -40,18 +40,18 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
-        View header1 = mCommonRecyclerAdapter.addHeaderView(R.layout.header_view);
-        header1.setOnClickListener(new View.OnClickListener() {
+        ViewBinder header1Binder = mCommonRecyclerAdapter.addHeaderView(R.layout.header_view);
+        header1Binder.getView().setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 toast("header click");
             }
         });
 
-        ViewBinder.create(header1).setText(R.id.header_text, "Header 1");
+        header1Binder.setText(R.id.header_text, "Header 1");
 
-        View header2 = mCommonRecyclerAdapter.addHeaderView(R.layout.header_view);
-        header2.setOnClickListener(new View.OnClickListener() {
+        ViewBinder header2Binder = mCommonRecyclerAdapter.addHeaderView(R.layout.header_view);
+        header2Binder.getView().setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 mCommonRecyclerAdapter.removeHeaderView(v);
@@ -59,8 +59,8 @@ public class MainActivity extends AppCompatActivity {
         });
 
 
-        View footer = mCommonRecyclerAdapter.addFooterView(R.layout.footer_view);
-        footer.setOnClickListener(new View.OnClickListener() {
+        ViewBinder footerBinder = mCommonRecyclerAdapter.addFooterView(R.layout.footer_view);
+        footerBinder.getView().setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 mCommonRecyclerAdapter.removeFooterView(v);
@@ -70,7 +70,6 @@ public class MainActivity extends AppCompatActivity {
         mCommonRecyclerAdapter.setOnItemClickListener(new CommonRecyclerAdapter.OnItemClickListener() {
             @Override
             public void onItemClick(ViewHolder holder, int position) {
-//                toast("Item click "+position);
                 MultiTypeActivity.start(MainActivity.this);
             }
         });
@@ -78,7 +77,7 @@ public class MainActivity extends AppCompatActivity {
         mCommonRecyclerAdapter.setOnItemLongClickListener(new CommonRecyclerAdapter.OnItemLongClickListener() {
             @Override
             public boolean onItemLongClick(ViewHolder holder, int position) {
-                toast("Item long click "+position);
+                mCommonRecyclerAdapter.set(position, "Item Long Click "+position);
                 return true;
             }
         });
