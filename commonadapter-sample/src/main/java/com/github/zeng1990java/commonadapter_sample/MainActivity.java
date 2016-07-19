@@ -33,6 +33,7 @@ public class MainActivity extends AppCompatActivity {
 //        mRecyclerView.setLayoutManager(new GridLayoutManager(this, 2));
 //        mRecyclerView.setLayoutManager(new StaggeredGridLayoutManager(2, StaggeredGridLayoutManager.VERTICAL));
 
+        // 单布局使用
         mRecyclerView.setAdapter(mCommonRecyclerAdapter = new CommonRecyclerAdapter<String>(this, R.layout.item_view, getDatas()) {
             @Override
             public void bindData(ViewHolder holder, String data, int position) {
@@ -40,6 +41,7 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
+        // 添加Header
         ViewBinder header1Binder = mCommonRecyclerAdapter.addHeaderView(R.layout.header_view);
         header1Binder.getView().setOnClickListener(new View.OnClickListener() {
             @Override
@@ -47,26 +49,30 @@ public class MainActivity extends AppCompatActivity {
                 toast("header click");
             }
         });
-
+        // header 数据绑定
         header1Binder.setText(R.id.header_text, "Header 1");
 
+        //
         ViewBinder header2Binder = mCommonRecyclerAdapter.addHeaderView(R.layout.header_view);
         header2Binder.getView().setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                // 移除header
                 mCommonRecyclerAdapter.removeHeaderView(v);
             }
         });
 
-
+        // 添加footer
         ViewBinder footerBinder = mCommonRecyclerAdapter.addFooterView(R.layout.footer_view);
         footerBinder.getView().setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                // 移除footer
                 mCommonRecyclerAdapter.removeFooterView(v);
             }
         });
 
+        // 设置item点击事件
         mCommonRecyclerAdapter.setOnItemClickListener(new CommonRecyclerAdapter.OnItemClickListener() {
             @Override
             public void onItemClick(ViewHolder holder, int position) {
@@ -74,6 +80,7 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
+        // 设置item长按事件
         mCommonRecyclerAdapter.setOnItemLongClickListener(new CommonRecyclerAdapter.OnItemLongClickListener() {
             @Override
             public boolean onItemLongClick(ViewHolder holder, int position) {
@@ -82,6 +89,7 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
+        // 设置加载更多监听器
         mCommonRecyclerAdapter.setOnLoadMoreListener(new CommonRecyclerAdapter.OnLoadMoreListener() {
             @Override
             public void onLoadMore() {
@@ -95,7 +103,9 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
+        // 设置加载跟多的布局
 //        mCommonRecyclerAdapter.setLoadMoreLayoutId(R.layout.custom_loading);
+        // 设置有加载更多
         mCommonRecyclerAdapter.setIsHasLoadMore(true);
     }
 
