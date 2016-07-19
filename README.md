@@ -7,6 +7,21 @@
 * 多Item布局支持
 * 滑动到底部加载更多
 
+## 添加到项目(JitPack.io)
+
+```groovy
+allprojects {
+	repositories {
+		...
+		maven { url "https://jitpack.io" }
+	}
+}
+
+dependencies {
+        compile 'com.github.zeng1990java:CommonRecyclerAdapter:0.1.0'
+}
+```
+
 ## 使用示例
 
 * 配置默认的加载更多布局和图片加载器
