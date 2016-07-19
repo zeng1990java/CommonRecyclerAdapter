@@ -18,7 +18,7 @@ import java.util.List;
 public class MainActivity extends AppCompatActivity {
 
     RecyclerView mRecyclerView;
-    CommonRecyclerAdapter mCommonRecyclerAdapter;
+    CommonRecyclerAdapter<String> mCommonRecyclerAdapter;
 
     private Handler mHandler = new Handler();
 
@@ -70,7 +70,8 @@ public class MainActivity extends AppCompatActivity {
         mCommonRecyclerAdapter.setOnItemClickListener(new CommonRecyclerAdapter.OnItemClickListener() {
             @Override
             public void onItemClick(ViewHolder holder, int position) {
-                toast("Item click "+position);
+//                toast("Item click "+position);
+                MultiTypeActivity.start(MainActivity.this);
             }
         });
 

@@ -296,6 +296,10 @@ public abstract class CommonRecyclerAdapter<T> extends RecyclerView.Adapter<View
         return mDatas.get(position);
     }
 
+    public List<T> getData(){
+        return mDatas;
+    }
+
     public void add(T data){
         add(0, data);
     }

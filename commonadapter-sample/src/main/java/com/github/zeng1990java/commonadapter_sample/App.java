@@ -14,7 +14,10 @@ public class App extends Application {
     @Override
     public void onCreate() {
         super.onCreate();
-        // 配置默认的加载更多布局
-        AdapterConfig.getInstance().setLoadingLayoutId(R.layout.custom_loading);
+        // 配置默认的加载更多布局和默认的图片加载器
+        AdapterConfig.getInstance()
+                .setLoadingLayoutId(R.layout.custom_loading)
+                .setImageLoader(new PicassoImageLoader());
+
     }
 }
