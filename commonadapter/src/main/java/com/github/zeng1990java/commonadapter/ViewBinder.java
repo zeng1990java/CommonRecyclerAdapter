@@ -35,6 +35,7 @@ public class ViewBinder {
     private Context mContext;
     private View mItemView;
     private AdapterImageLoader mImageLoader;
+    private int mPosition;
 
     private ViewBinder(Context context, View itemView){
         this(context, itemView, AdapterConfig.getInstance().getImageLoader());
@@ -60,6 +61,14 @@ public class ViewBinder {
 
     public static ViewBinder create(Context context, View itemView, AdapterImageLoader imageLoader){
         return new ViewBinder(context, itemView, imageLoader);
+    }
+
+    public int getPosition() {
+        return mPosition;
+    }
+
+    void setPosition(int position) {
+        this.mPosition = position;
     }
 
     /**

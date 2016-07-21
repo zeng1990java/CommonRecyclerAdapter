@@ -10,7 +10,7 @@ import android.support.v7.widget.RecyclerView;
 import android.widget.Toast;
 
 import com.github.zeng1990java.commonadapter.CommonRecyclerAdapter;
-import com.github.zeng1990java.commonadapter.ViewHolder;
+import com.github.zeng1990java.commonadapter.ViewBinder;
 import com.github.zeng1990java.commonadapter_sample.bean.News;
 import com.github.zeng1990java.commonadapter_sample.consts.Consts;
 import com.github.zeng1990java.commonadapter_sample.data.NewDataSource;
@@ -41,8 +41,8 @@ public class MultiTypeActivity extends AppCompatActivity {
 
         mNewsAdapter.setOnItemClickListener(new CommonRecyclerAdapter.OnItemClickListener() {
             @Override
-            public void onItemClick(ViewHolder holder, int position) {
-                News news = mNewsAdapter.getItem(position);
+            public void onItemClick(ViewBinder binder) {
+                News news = mNewsAdapter.getItem(binder.getPosition());
                 Toast.makeText(MultiTypeActivity.this, news.getTitle(), Toast.LENGTH_SHORT).show();
             }
         });
@@ -53,7 +53,7 @@ public class MultiTypeActivity extends AppCompatActivity {
     private class NewsAdapter extends CommonRecyclerAdapter<News>{
 
         public NewsAdapter(@NonNull Context context) {
-            super(context, 0);
+            super(context);
         }
 
         @Override
@@ -74,10 +74,10 @@ public class MultiTypeActivity extends AppCompatActivity {
         }
 
         @Override
-        public void bindData(ViewHolder holder, News data, int position) {
+        public void bindData(ViewBinder binder, News data) {
             switch (data.getNewsType()){
                 case News.TYPE_NONE_PICTURE:
-                    holder.viewBinder().setText(R.id.item_none_picture_title, data.getTitle())
+                    binder.setText(R.id.item_none_picture_title, data.getTitle())
                             .setText(R.id.item_none_picture_author,
                                      String.format(Locale.CHINA, Consts.FORMAT_AUTHOR, data.getAuthor()))
                             .setText(R.id.item_none_picture_date,
@@ -85,7 +85,7 @@ public class MultiTypeActivity extends AppCompatActivity {
                             .setText(R.id.item_none_picture_intro, data.getIntro());
                     break;
                 case News.TYPE_SINGLE_PICTURE:
-                    holder.viewBinder().setText(R.id.item_single_picture_title, data.getTitle())
+                    binder.setText(R.id.item_single_picture_title, data.getTitle())
                             .setText(R.id.item_single_picture_author,
                                      String.format(Locale.CHINA, Consts.FORMAT_AUTHOR, data.getAuthor()))
                             .setText(R.id.item_single_picture_date,
@@ -94,7 +94,7 @@ public class MultiTypeActivity extends AppCompatActivity {
                     break;
                 case News.TYPE_MULTIPLE_PICTURE:
                     String[] urls = data.getCoverUrl().split(Consts.URL_SEPARATOR);
-                    holder.viewBinder().setText(R.id.item_multiple_picture_intro, data.getIntro())
+                    binder.setText(R.id.item_multiple_picture_intro, data.getIntro())
                             .setImageUrl(R.id.item_multiple_picture_cover_left,urls[0])
                             .setImageUrl(R.id.item_multiple_picture_cover_right, urls[1]);
                     break;
