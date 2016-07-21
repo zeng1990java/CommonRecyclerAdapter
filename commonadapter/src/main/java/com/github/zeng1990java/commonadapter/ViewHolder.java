@@ -9,7 +9,7 @@ import android.view.View;
  * @author zxb
  * @date 16/7/16 下午11:31
  */
-public class ViewHolder extends RecyclerView.ViewHolder {
+class ViewHolder extends RecyclerView.ViewHolder {
 
     private ViewBinder mViewBinder;
 
@@ -18,8 +18,8 @@ public class ViewHolder extends RecyclerView.ViewHolder {
         mViewBinder = ViewBinder.create(itemView);
     }
 
-    public ViewHolder(View itemView, ViewBinder viewBinder){
-        super(itemView);
+    public ViewHolder(ViewBinder viewBinder){
+        super(viewBinder.getView());
         mViewBinder = viewBinder;
     }
 

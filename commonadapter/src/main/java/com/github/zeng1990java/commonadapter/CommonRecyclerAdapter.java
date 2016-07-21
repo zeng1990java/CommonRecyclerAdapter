@@ -24,19 +24,22 @@ import java.util.List;
 public abstract class CommonRecyclerAdapter<T> extends RecyclerView.Adapter<ViewHolder> {
 
     public interface OnItemClickListener{
-        void onItemClick(ViewHolder holder, int position);
+        void onItemClick(ViewBinder binder);
     }
 
     public interface OnItemLongClickListener{
-        boolean onItemLongClick(ViewHolder holder, int position);
+        boolean onItemLongClick(ViewBinder binder);
     }
 
     public interface OnLoadMoreListener{
         void onLoadMore();
     }
 
+    private static final int TYPE_HEADER = -1;
+    private static final int TYPE_FOOTER = -2;
+    private static final int TYPE_LOADMORE = -3;
+
     private Context mContext;
-    private int mLayoutId;
     private List<T> mDatas;
     private LayoutInflater mInflater;
 
@@ -69,13 +72,12 @@ public abstract class CommonRecyclerAdapter<T> extends RecyclerView.Adapter<View
         mLoadMoreLayoutId = loadMoreLayoutId;
     }
 
-    public CommonRecyclerAdapter(@NonNull Context context, int layoutId){
-        this(context, layoutId, new ArrayList<T>());
+    public CommonRecyclerAdapter(@NonNull Context context){
+        this(context, new ArrayList<T>());
     }
 
-    public CommonRecyclerAdapter(@NonNull Context context, int layoutId, @NonNull List<T> datas){
+    public CommonRecyclerAdapter(@NonNull Context context, @NonNull List<T> datas){
         mContext = context;
-        mLayoutId = layoutId;
         mDatas = datas;
         mInflater = LayoutInflater.from(mContext);
         mLoadMoreLayoutId = AdapterConfig.getInstance().getLoadingLayoutId();
@@ -198,27 +200,36 @@ public abstract class CommonRecyclerAdapter<T> extends RecyclerView.Adapter<View
         }
     }
 
-    @Override
-    public ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
-        if (viewType == R.layout.adapter_view_header_layout){
-            return new ViewHolder(mHeaderLayout);
-        }
-
-        if (viewType == R.layout.adapter_view_footer_layout){
-            return new ViewHolder(mFooterLayout);
-        }
-
-        if (viewType == R.layout.adapter_view_load_layout){
-            View itemView = inflateItemView(parent, mLoadMoreLayoutId);
-            return new ViewHolder(itemView);
-        }
-        View itemView = inflateItemView(parent, viewType);
-        ViewBinder viewBinder = createViewBinder(itemView);
-        return new ViewHolder(itemView, viewBinder);
+    private int getRealPosition(int position) {
+        return position - getHeaderViewItemCount();
     }
 
     @Override
-    public void onBindViewHolder(final ViewHolder holder, int position) {
+    public final ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
+        ViewHolder holder;
+        switch (viewType) {
+            case TYPE_HEADER:
+                holder = new ViewHolder(mHeaderLayout);
+                break;
+            case TYPE_FOOTER:
+                holder = new ViewHolder(mFooterLayout);
+                break;
+            case TYPE_LOADMORE:
+                View loadmoreView = inflateItemView(parent, mLoadMoreLayoutId);
+                holder = new ViewHolder(loadmoreView);
+                break;
+            default:
+                int layoutId = viewType;
+                View itemView = inflateItemView(parent, layoutId);
+                ViewBinder viewBinder = createViewBinder(itemView);
+                holder = new ViewHolder(viewBinder);
+                break;
+        }
+        return holder;
+    }
+
+    @Override
+    public final void onBindViewHolder(ViewHolder holder, int position) {
         if (isHeader(position) || isFooter(position)){
             return;
         }
@@ -233,46 +244,47 @@ public abstract class CommonRecyclerAdapter<T> extends RecyclerView.Adapter<View
             return;
         }
 
-        final int dataPosition = position - getHeaderViewItemCount();
+        final int dataPosition = getRealPosition(position);
+        final ViewBinder binder = holder.viewBinder();
+        binder.setPosition(dataPosition);
 
-        holder.itemView.setOnClickListener(new View.OnClickListener() {
+        binder.getView().setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 if (mOnItemClickListener != null){
-                    mOnItemClickListener.onItemClick(holder, dataPosition);
+                    mOnItemClickListener.onItemClick(binder);
                 }
             }
         });
 
-        holder.itemView.setOnLongClickListener(new View.OnLongClickListener() {
+        binder.getView().setOnLongClickListener(new View.OnLongClickListener() {
             @Override
             public boolean onLongClick(View v) {
-                if (mOnItemLongClickListener != null){
-                    return mOnItemLongClickListener.onItemLongClick(holder, dataPosition);
-                }
-                return false;
+                return mOnItemLongClickListener != null
+                        && mOnItemLongClickListener.onItemLongClick(binder);
             }
         });
 
-        bindData(holder, getItem(dataPosition), dataPosition);
+        bindData(binder, getItem(dataPosition));
     }
 
-    public abstract void bindData(ViewHolder holder, T data, int position);
+    public abstract void bindData(ViewBinder binder, T data);
 
     @Override
-    public int getItemViewType(int position) {
+    public final int getItemViewType(int position) {
         if (isHeader(position)){
-            return R.layout.adapter_view_header_layout;
+            return TYPE_HEADER;
         }
 
         if (isFooter(position)){
-            return R.layout.adapter_view_footer_layout;
+            return TYPE_FOOTER;
         }
 
         if (isLoadMore(position)){
-            return R.layout.adapter_view_load_layout;
+            return TYPE_LOADMORE;
         }
-        int dataPosition = position - getHeaderViewItemCount();
+
+        int dataPosition = getRealPosition(position);
         return getItemLayoutResId(getItem(dataPosition), dataPosition);
     }
 
@@ -288,9 +300,7 @@ public abstract class CommonRecyclerAdapter<T> extends RecyclerView.Adapter<View
         return mInflater.inflate(layoutId, parent, false);
     }
 
-    public int getItemLayoutResId(T data, int position){
-        return mLayoutId;
-    }
+    public abstract int getItemLayoutResId(T data, int position);
 
     public T getItem(int position){
         return mDatas.get(position);
@@ -350,7 +360,6 @@ public abstract class CommonRecyclerAdapter<T> extends RecyclerView.Adapter<View
 
         // 遍历新列表，对旧列表数据进行更新，增加，删除
         for (int indexNew = 0; indexNew < datas.size(); indexNew++) {
-
             T item = datas.get(indexNew);
             int indexOld = mDatas.indexOf(item);
             if (indexOld == -1){
@@ -442,20 +451,14 @@ public abstract class CommonRecyclerAdapter<T> extends RecyclerView.Adapter<View
         return hasLoadMoreView() ? 1 : 0;
     }
 
-    private boolean hasHeaderView(){
-        if (mHeaderLayout == null){
-            return false;
-        }
-
-        return mHeaderLayout.getChildCount() > 0;
+    private boolean hasHeaderView() {
+        return mHeaderLayout != null
+                && mHeaderLayout.getChildCount() > 0;
     }
 
-    private boolean hasFooterView(){
-        if(mFooterLayout == null){
-            return false;
-        }
-
-        return mFooterLayout.getChildCount() > 0;
+    private boolean hasFooterView() {
+        return mFooterLayout != null
+                && mFooterLayout.getChildCount() > 0;
     }
 
     private boolean hasLoadMoreView(){

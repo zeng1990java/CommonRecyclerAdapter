@@ -10,7 +10,6 @@ import android.widget.Toast;
 
 import com.github.zeng1990java.commonadapter.CommonRecyclerAdapter;
 import com.github.zeng1990java.commonadapter.ViewBinder;
-import com.github.zeng1990java.commonadapter.ViewHolder;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -34,10 +33,14 @@ public class MainActivity extends AppCompatActivity {
 //        mRecyclerView.setLayoutManager(new StaggeredGridLayoutManager(2, StaggeredGridLayoutManager.VERTICAL));
 
         // 单布局使用
-        mRecyclerView.setAdapter(mCommonRecyclerAdapter = new CommonRecyclerAdapter<String>(this, R.layout.item_view, getDatas()) {
+        mRecyclerView.setAdapter(mCommonRecyclerAdapter = new CommonRecyclerAdapter<String>(this, getDatas()) {
             @Override
-            public void bindData(ViewHolder holder, String data, int position) {
-                holder.viewBinder().setText(R.id.text, data + " position: "+position);
+            public void bindData(ViewBinder binder, String data) {
+                binder.setText(R.id.text, data + " position: "+binder.getPosition());
+            }
+            @Override
+            public int getItemLayoutResId(String data, int position) {
+                return R.layout.item_view;
             }
         });
 
@@ -75,7 +78,7 @@ public class MainActivity extends AppCompatActivity {
         // 设置item点击事件
         mCommonRecyclerAdapter.setOnItemClickListener(new CommonRecyclerAdapter.OnItemClickListener() {
             @Override
-            public void onItemClick(ViewHolder holder, int position) {
+            public void onItemClick(ViewBinder binder) {
                 MultiTypeActivity.start(MainActivity.this);
             }
         });
@@ -83,8 +86,8 @@ public class MainActivity extends AppCompatActivity {
         // 设置item长按事件
         mCommonRecyclerAdapter.setOnItemLongClickListener(new CommonRecyclerAdapter.OnItemLongClickListener() {
             @Override
-            public boolean onItemLongClick(ViewHolder holder, int position) {
-                mCommonRecyclerAdapter.set(position, "Item Long Click "+position);
+            public boolean onItemLongClick(ViewBinder binder) {
+                mCommonRecyclerAdapter.set(binder.getPosition(), "Item Long Click "+binder.getPosition());
                 return true;
             }
         });
