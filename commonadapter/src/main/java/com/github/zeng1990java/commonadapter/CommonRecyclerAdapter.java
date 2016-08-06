@@ -12,7 +12,6 @@ import android.view.ViewGroup;
 import android.widget.LinearLayout;
 
 import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.List;
 
 /**
@@ -21,7 +20,7 @@ import java.util.List;
  * @author zxb
  * @date 16/7/16 下午11:54
  */
-public abstract class CommonRecyclerAdapter<T> extends RecyclerView.Adapter<ViewHolder> {
+public abstract class CommonRecyclerAdapter<T> extends ArrayRecyclerAdapter<T,ViewHolder> {
 
     public interface OnItemClickListener{
         void onItemClick(ViewHolder holder, int position);
@@ -37,7 +36,6 @@ public abstract class CommonRecyclerAdapter<T> extends RecyclerView.Adapter<View
 
     private Context mContext;
     private int mLayoutId;
-    private List<T> mDatas;
     private LayoutInflater mInflater;
 
     private LinearLayout mHeaderLayout;
@@ -292,122 +290,6 @@ public abstract class CommonRecyclerAdapter<T> extends RecyclerView.Adapter<View
         return mLayoutId;
     }
 
-    public T getItem(int position){
-        return mDatas.get(position);
-    }
-
-    public List<T> getData(){
-        return mDatas;
-    }
-
-    public void add(T data){
-        add(0, data);
-    }
-
-    public void add(int position, T data){
-        mDatas.add(position, data);
-        notifyItemInserted(position+getHeaderViewItemCount());
-    }
-
-    public void remove(int position, T data){
-        mDatas.remove(position);
-        notifyItemRemoved(position+getHeaderViewItemCount());
-    }
-
-    public void addAll(@NonNull List<T> datas){
-        int positionStart = mDatas.size();
-        mDatas.addAll(datas);
-        notifyItemRangeInserted(positionStart + getHeaderViewItemCount(), datas.size());
-    }
-
-    public void replaceAll(@NonNull List<T> datas){
-        if (mDatas.equals(datas)){
-            return;
-        }
-
-        if (mDatas.isEmpty() && datas.isEmpty()) {
-            return;
-        }
-
-        if (mDatas.isEmpty()){
-            addAll(datas);
-            return;
-        }
-
-        if (datas.isEmpty()){
-            clear();
-            return;
-        }
-
-        // 首先将就列表有，新列表没有的从旧列表中移除
-        retainAll(datas);
-
-        // 如果列表空了，直接插入全部就好了
-        if (mDatas.isEmpty()) {
-            addAll(datas);
-            return;
-        }
-
-        // 遍历新列表，对旧列表数据进行更新，增加，删除
-        for (int indexNew = 0; indexNew < datas.size(); indexNew++) {
-
-            T item = datas.get(indexNew);
-            int indexOld = mDatas.indexOf(item);
-            if (indexOld == -1){
-                add(indexNew, item);
-            }else if (indexNew == indexOld){
-                set(indexNew, item);
-            }else {
-                mDatas.remove(indexOld);
-                mDatas.add(indexNew, item);
-                notifyItemMoved(indexOld + getHeaderViewItemCount(), indexNew + getHeaderViewItemCount());
-            }
-        }
-
-    }
-
-    public void set(int postion, T data){
-        mDatas.set(postion, data);
-        notifyItemChanged(getHeaderViewItemCount() + postion);
-    }
-
-    public void set(T oldData, T newData){
-        if (contains(oldData)) {
-            set(mDatas.indexOf(oldData), newData);
-        }
-    }
-
-    public void retainAll(@NonNull List<T> datas){
-        if (datas.isEmpty()){
-            clear();
-            return;
-        }
-        Iterator<T> iterator = mDatas.iterator();
-        while (iterator.hasNext()){
-            T next = iterator.next();
-            if (datas.contains(next)){
-                continue;
-            }
-            int index = mDatas.indexOf(next);
-            iterator.remove();
-            notifyItemRemoved(getHeaderViewItemCount() + index);
-        }
-
-    }
-
-    public void clear(){
-        if (mDatas.isEmpty()){
-            return;
-        }
-        int size = mDatas.size();
-        mDatas.clear();
-        notifyItemRangeRemoved(getHeaderViewItemCount(), size);
-    }
-
-    public boolean contains(T data){
-        return mDatas.contains(data);
-    }
-
     @Override
     public int getItemCount() {
         return getDataItemCount() + getHeaderViewItemCount() + getFooterViewItemCount() + getLoadMoreViewItemCount();
@@ -460,5 +342,10 @@ public abstract class CommonRecyclerAdapter<T> extends RecyclerView.Adapter<View
 
     private boolean hasLoadMoreView(){
         return isHasLoadMore;
+    }
+
+    @Override
+    protected int getAdapterPosition(int dataPosition) {
+        return getHeaderViewItemCount() + dataPosition;
     }
 }
