@@ -42,7 +42,9 @@ public abstract class CommonRecyclerAdapter<T> extends ArrayRecyclerAdapter<T,Vi
     private LinearLayout mFooterLayout;
 
     private boolean isHasLoadMore = false;
-    private boolean isLoadingMore = false;
+/* private boolean isLoadingMore = false; */
+
+    private LoadMoreView.LoadState mLoadState = LoadMoreView.LoadState.IDLE;
 
     private OnItemClickListener mOnItemClickListener;
     private OnItemLongClickListener mOnItemLongClickListener;
@@ -84,7 +86,7 @@ public abstract class CommonRecyclerAdapter<T> extends ArrayRecyclerAdapter<T,Vi
      * @param isHasLoadMore
      */
     public void setIsHasLoadMore(boolean isHasLoadMore){
-        isLoadingMore = false;
+        mLoadState = LoadMoreView.LoadState.IDLE;
         if (this.isHasLoadMore == isHasLoadMore){
             return;
         }
@@ -93,11 +95,17 @@ public abstract class CommonRecyclerAdapter<T> extends ArrayRecyclerAdapter<T,Vi
     }
 
     public void onLoadMoreComplete(){
-        isLoadingMore = false;
+        mLoadState = LoadMoreView.LoadState.IDLE;
+        notifyItemChanged(getHeaderViewItemCount() + getDataItemCount()+getFooterViewItemCount());
+    }
+
+    public void onLoadMoreError(){
+        mLoadState = LoadMoreView.LoadState.ERROR;
+        notifyItemChanged(getHeaderViewItemCount() + getDataItemCount()+getFooterViewItemCount());
     }
 
     public boolean isLoadingMore(){
-        return isLoadingMore;
+        return mLoadState == LoadMoreView.LoadState.LOADING;
     }
 
     public ViewBinder addHeaderView(@LayoutRes int layoutId){
@@ -162,6 +170,13 @@ public abstract class CommonRecyclerAdapter<T> extends ArrayRecyclerAdapter<T,Vi
     @Override
     public void onViewAttachedToWindow(ViewHolder holder) {
         int position = holder.getAdapterPosition();
+
+        if (isLoadMore(position)){
+            if (mLoadState == LoadMoreView.LoadState.ERROR){
+                mLoadState = LoadMoreView.LoadState.IDLE;
+            }
+        }
+
         if (isHeader(position) || isFooter(position) || isLoadMore(position)){
             ViewGroup.LayoutParams lp = holder.itemView.getLayoutParams();
             if (lp != null && lp instanceof StaggeredGridLayoutManager.LayoutParams){
@@ -181,6 +196,11 @@ public abstract class CommonRecyclerAdapter<T> extends ArrayRecyclerAdapter<T,Vi
             gridLayoutManager.setSpanSizeLookup(new GridLayoutManager.SpanSizeLookup() {
                 @Override
                 public int getSpanSize(int position) {
+                    if (isLoadMore(position)){
+                        if (mLoadState == LoadMoreView.LoadState.ERROR){
+                            mLoadState = LoadMoreView.LoadState.IDLE;
+                        }
+                    }
                     if (isHeader(position) || isFooter(position) || isLoadMore(position)){
                         return gridLayoutManager.getSpanCount();
                     }
@@ -208,6 +228,19 @@ public abstract class CommonRecyclerAdapter<T> extends ArrayRecyclerAdapter<T,Vi
 
         if (viewType == R.layout.adapter_view_load_layout){
             View itemView = inflateItemView(parent, mLoadMoreLayoutId);
+            itemView.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    if (isHasLoadMore && !isLoadingMore() && mLoadState == LoadMoreView.LoadState.IDLE){
+                        mLoadState = LoadMoreView.LoadState.LOADING;
+                        if (mOnLoadMoreListener != null){
+                            mOnLoadMoreListener.onLoadMore();
+                        }
+
+                        notifyItemChanged(getHeaderViewItemCount() + getDataItemCount() + getFooterViewItemCount());
+                    }
+                }
+            });
             return new ViewHolder(itemView);
         }
         View itemView = inflateItemView(parent, viewType);
@@ -222,8 +255,14 @@ public abstract class CommonRecyclerAdapter<T> extends ArrayRecyclerAdapter<T,Vi
         }
 
         if (isLoadMore(position)){
-            if (isHasLoadMore && !isLoadingMore){
-                isLoadingMore = true;
+
+            if (holder.itemView instanceof LoadMoreView){
+                LoadMoreView loadMoreView = (LoadMoreView) holder.itemView;
+                loadMoreView.setLoadState(mLoadState);
+            }
+
+            if (isHasLoadMore && !isLoadingMore() && mLoadState == LoadMoreView.LoadState.IDLE){
+                mLoadState = LoadMoreView.LoadState.LOADING;
                 if (mOnLoadMoreListener != null){
                     mOnLoadMoreListener.onLoadMore();
                 }
@@ -347,5 +386,21 @@ public abstract class CommonRecyclerAdapter<T> extends ArrayRecyclerAdapter<T,Vi
     @Override
     protected int getAdapterPosition(int dataPosition) {
         return getHeaderViewItemCount() + dataPosition;
+    }
+
+    @Override
+    public void replaceAll(@NonNull List<T> datas) {
+        boolean curHasMore = isHasLoadMore;
+        setIsHasLoadMore(false);
+        super.replaceAll(datas);
+        setIsHasLoadMore(curHasMore);
+    }
+
+    @Override
+    public void retainAll(@NonNull List<T> datas) {
+        boolean curHasMore = isHasLoadMore;
+        setIsHasLoadMore(false);
+        super.retainAll(datas);
+        setIsHasLoadMore(curHasMore);
     }
 }
