@@ -196,11 +196,6 @@ public abstract class CommonRecyclerAdapter<T> extends ArrayRecyclerAdapter<T,Vi
             gridLayoutManager.setSpanSizeLookup(new GridLayoutManager.SpanSizeLookup() {
                 @Override
                 public int getSpanSize(int position) {
-                    if (isLoadMore(position)){
-                        if (mLoadState == LoadMoreView.LoadState.ERROR){
-                            mLoadState = LoadMoreView.LoadState.IDLE;
-                        }
-                    }
                     if (isHeader(position) || isFooter(position) || isLoadMore(position)){
                         return gridLayoutManager.getSpanCount();
                     }
@@ -231,7 +226,7 @@ public abstract class CommonRecyclerAdapter<T> extends ArrayRecyclerAdapter<T,Vi
             itemView.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    if (isHasLoadMore && !isLoadingMore() && mLoadState == LoadMoreView.LoadState.IDLE){
+                    if (isHasLoadMore && !isLoadingMore()){
                         mLoadState = LoadMoreView.LoadState.LOADING;
                         if (mOnLoadMoreListener != null){
                             mOnLoadMoreListener.onLoadMore();

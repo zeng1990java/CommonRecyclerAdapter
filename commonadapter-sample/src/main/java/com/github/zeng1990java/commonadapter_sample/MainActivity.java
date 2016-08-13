@@ -14,6 +14,7 @@ import com.github.zeng1990java.commonadapter.ViewHolder;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Random;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -96,10 +97,17 @@ public class MainActivity extends AppCompatActivity {
                 mHandler.postDelayed(new Runnable() {
                     @Override
                     public void run() {
-                        mCommonRecyclerAdapter.setIsHasLoadMore(false);
-                        mCommonRecyclerAdapter.addAll(getDatas());
+                        int random = new Random().nextInt(20);
+                        Toast.makeText(getApplicationContext(), "random: "+random, Toast.LENGTH_SHORT).show();
+                        if (random < 10){
+                            mCommonRecyclerAdapter.onLoadMoreError();
+                        }else {
+                            mCommonRecyclerAdapter.setIsHasLoadMore(true);
+                            mCommonRecyclerAdapter.addAll(getDatas());
+                        }
+
                     }
-                }, 5000);
+                }, 2000);
             }
         });
 
