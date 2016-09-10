@@ -271,7 +271,7 @@ public abstract class CommonRecyclerAdapter<T> extends ArrayRecyclerAdapter<T,Vi
             @Override
             public void onClick(View v) {
                 if (mOnItemClickListener != null){
-                    mOnItemClickListener.onItemClick(holder, dataPosition);
+                    mOnItemClickListener.onItemClick(holder, holder.getAdapterPosition() - getHeaderViewItemCount());
                 }
             }
         });
@@ -280,7 +280,7 @@ public abstract class CommonRecyclerAdapter<T> extends ArrayRecyclerAdapter<T,Vi
             @Override
             public boolean onLongClick(View v) {
                 if (mOnItemLongClickListener != null){
-                    return mOnItemLongClickListener.onItemLongClick(holder, dataPosition);
+                    return mOnItemLongClickListener.onItemLongClick(holder, holder.getAdapterPosition() - getHeaderViewItemCount());
                 }
                 return false;
             }
