@@ -18,7 +18,7 @@ allprojects {
 }
 
 dependencies {
-        compile 'com.github.zeng1990java:CommonRecyclerAdapter:0.3.1'
+        compile 'com.github.zeng1990java:CommonRecyclerAdapter:0.3.2'
 }
 ```
 
