@@ -130,6 +130,10 @@ public class MainActivity extends AppCompatActivity {
         mCommonRecyclerAdapter.add("new add data "+new Random().nextInt(20));
     }
 
+    public void horizontal(View v){
+        HorizontalRecyclerViewActivity.start(this);
+    }
+
     private void toast(String text){
         Toast.makeText(this, text, Toast.LENGTH_SHORT).show();
     }

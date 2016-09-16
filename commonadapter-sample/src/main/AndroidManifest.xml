@@ -20,6 +20,8 @@
         </activity>
         <activity android:name=".MultiTypeActivity">
         </activity>
+
+        <activity android:name=".HorizontalRecyclerViewActivity"/>
     </application>
 
 </manifest>

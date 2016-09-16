@@ -4,6 +4,7 @@ import android.content.Context;
 import android.support.annotation.LayoutRes;
 import android.support.annotation.NonNull;
 import android.support.v7.widget.GridLayoutManager;
+import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.StaggeredGridLayoutManager;
 import android.view.LayoutInflater;
@@ -21,6 +22,9 @@ import java.util.List;
  * @date 16/7/16 下午11:54
  */
 public abstract class CommonRecyclerAdapter<T> extends ArrayRecyclerAdapter<T,ViewHolder> {
+
+    public static final int HORIZONTAL = LinearLayoutManager.HORIZONTAL;
+    public static final int VERTICAL = LinearLayoutManager.VERTICAL;
 
     public interface OnItemClickListener{
         void onItemClick(ViewHolder holder, int position);
@@ -52,6 +56,24 @@ public abstract class CommonRecyclerAdapter<T> extends ArrayRecyclerAdapter<T,Vi
 
     @LayoutRes
     private int mLoadMoreLayoutId;
+
+    private int mOrientation = VERTICAL;
+
+    public int getOrientation() {
+        return mOrientation;
+    }
+
+    /**
+     * 设置RecyclerView的方向, 在addFooterView和addHeaderView前调用生效
+     * @param orientation Layout orientation. Should be {@link #HORIZONTAL} or {@link
+     *                      #VERTICAL}.
+     */
+    public void setOrientation(int orientation) {
+        if (orientation != VERTICAL && orientation != HORIZONTAL){
+            throw new IllegalArgumentException("unknown orientation: "+orientation);
+        }
+        mOrientation = orientation;
+    }
 
     public void setOnItemClickListener(OnItemClickListener onItemClickListener) {
         mOnItemClickListener = onItemClickListener;
@@ -148,13 +170,21 @@ public abstract class CommonRecyclerAdapter<T> extends ArrayRecyclerAdapter<T,Vi
 
     private void ensureHeaderLayout(){
         if (mHeaderLayout == null){
-            mHeaderLayout = createVerticalLayout();
+            if (mOrientation == VERTICAL) {
+                mHeaderLayout = createVerticalLayout();
+            }else {
+                mHeaderLayout = createHorizontalLayout();
+            }
         }
     }
 
     private void ensureFooterLayout(){
         if (mFooterLayout == null){
-            mFooterLayout = createVerticalLayout();
+            if (mOrientation == VERTICAL) {
+                mFooterLayout = createVerticalLayout();
+            }else {
+                mFooterLayout = createHorizontalLayout();
+            }
         }
     }
 
@@ -162,6 +192,15 @@ public abstract class CommonRecyclerAdapter<T> extends ArrayRecyclerAdapter<T,Vi
         LinearLayout linearLayout = new LinearLayout(mContext);
         linearLayout.setOrientation(LinearLayout.VERTICAL);
         ViewGroup.LayoutParams lp = new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
+        linearLayout.setLayoutParams(lp);
+
+        return linearLayout;
+    }
+
+    private LinearLayout createHorizontalLayout(){
+        LinearLayout linearLayout = new LinearLayout(mContext);
+        linearLayout.setOrientation(LinearLayout.HORIZONTAL);
+        ViewGroup.LayoutParams lp = new ViewGroup.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.MATCH_PARENT);
         linearLayout.setLayoutParams(lp);
 
         return linearLayout;
