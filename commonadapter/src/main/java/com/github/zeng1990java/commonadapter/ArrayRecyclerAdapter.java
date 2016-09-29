@@ -42,6 +42,10 @@ public abstract class ArrayRecyclerAdapter<T, VH extends RecyclerView.ViewHolder
         add(0, data);
     }
 
+    public void addLast(T data){
+        add(mDatas.size(), data);
+    }
+
     public void add(int position, T data){
         mDatas.add(position, data);
         notifyItemInserted(position+getAdapterPosition(0));

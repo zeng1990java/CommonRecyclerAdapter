@@ -385,19 +385,19 @@ public abstract class CommonRecyclerAdapter<T> extends ArrayRecyclerAdapter<T,Vi
         return hasLoadMoreView() && (position == getHeaderViewItemCount() + getDataItemCount() + getFooterViewItemCount());
     }
 
-    private int getHeaderViewItemCount(){
+    public int getHeaderViewItemCount(){
         return hasHeaderView() ? 1 : 0;
     }
 
-    private int getFooterViewItemCount(){
+    public int getFooterViewItemCount(){
         return hasFooterView() ? 1 : 0;
     }
 
-    private int getLoadMoreViewItemCount(){
+    public int getLoadMoreViewItemCount(){
         return hasLoadMoreView() ? 1 : 0;
     }
 
-    private boolean hasHeaderView(){
+    public boolean hasHeaderView(){
         if (mHeaderLayout == null){
             return false;
         }
@@ -405,7 +405,7 @@ public abstract class CommonRecyclerAdapter<T> extends ArrayRecyclerAdapter<T,Vi
         return mHeaderLayout.getChildCount() > 0;
     }
 
-    private boolean hasFooterView(){
+    public boolean hasFooterView(){
         if(mFooterLayout == null){
             return false;
         }
@@ -413,7 +413,7 @@ public abstract class CommonRecyclerAdapter<T> extends ArrayRecyclerAdapter<T,Vi
         return mFooterLayout.getChildCount() > 0;
     }
 
-    private boolean hasLoadMoreView(){
+    public boolean hasLoadMoreView(){
         return isHasLoadMore;
     }
 
