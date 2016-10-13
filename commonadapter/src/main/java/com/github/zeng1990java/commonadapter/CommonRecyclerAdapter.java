@@ -385,18 +385,30 @@ public abstract class CommonRecyclerAdapter<T> extends ArrayRecyclerAdapter<T,Vi
         return hasLoadMoreView() && (position == getHeaderViewItemCount() + getDataItemCount() + getFooterViewItemCount());
     }
 
-    public int getHeaderViewItemCount(){
+    /**
+     * 有Header返回1，没有返回0
+     * @return
+     */
+    protected int getHeaderViewItemCount(){
         return hasHeaderView() ? 1 : 0;
     }
 
-    public int getFooterViewItemCount(){
+    /**
+     * 有Footer返回1，没有返回0
+     * @return
+     */
+    protected int getFooterViewItemCount(){
         return hasFooterView() ? 1 : 0;
     }
 
-    public int getLoadMoreViewItemCount(){
+    protected int getLoadMoreViewItemCount(){
         return hasLoadMoreView() ? 1 : 0;
     }
 
+    /**
+     * 是否添加了Header
+     * @return
+     */
     public boolean hasHeaderView(){
         if (mHeaderLayout == null){
             return false;
@@ -405,6 +417,10 @@ public abstract class CommonRecyclerAdapter<T> extends ArrayRecyclerAdapter<T,Vi
         return mHeaderLayout.getChildCount() > 0;
     }
 
+    /**
+     * 是否添加了Footer
+     * @return
+     */
     public boolean hasFooterView(){
         if(mFooterLayout == null){
             return false;
